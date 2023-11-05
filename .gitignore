@@ -1,0 +1,15 @@
+# IDE
+.vscode
+
+# build artifacts
+build
+*.z64
+*.bin
+*.elf
+*.o
+
+# analysis
+figures
+*.txt
+# make an exception for the sample results
+!sample_results.txt

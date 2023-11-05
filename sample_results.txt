@@ -1,0 +1,412 @@
+All are 320x240 rgba16 fillrect, each ran 1000 times and results averaged.
+
+Note only the first 2-3 decimals are meaningful. Numbers that are close together
+  should be considered the same speed, as different runs may reorder such results.
+
+The timing method uses the RDP counter registers BUFBUSY and PIPEBUSY. These are
+  reset to 0 before the RDP is woken up from idle so they begin counting precisely
+  when the processing begins. A single fullscreen fillrect is processed before a
+  fullsync, which returns the RDP to idle and stops the counters automatically.
+  This produces highly precise timings, the only variance is due to variation in
+  stall times for waiting on RDRAM accesses. All setup is done prior to resetting
+  the counters in a separate RDP command list.
+
+force_blend does not affect timings. If image_read (IM_RD) is on the RDP will
+ fetch spans from the color image irrespective of whether the span contains any
+ edge pixels.
+
+Numbers are: min time, average time, max time
+
+
+
+No ZB, No VI
+  image_read off
+    1-cycle
+      Buf:  1.2873920ms, 1.2879956ms, 1.2889920ms
+      Pipe: 1.2874720ms, 1.2880889ms, 1.2890880ms
+    2-cycle
+      Buf:  2.5176000ms, 2.5182880ms, 2.5190720ms
+      Pipe: 2.5176480ms, 2.5183484ms, 2.5191360ms
+  image_read on
+    1-cycle
+      Buf:  2.6149760ms, 2.6168881ms, 2.6184640ms
+      Pipe: 2.6154240ms, 2.6172602ms, 2.6188160ms
+    2-cycle
+      Buf:  2.5916480ms, 2.5933406ms, 2.5950400ms
+      Pipe: 2.5916960ms, 2.5934009ms, 2.5951040ms
+
+No ZB, VI
+  FB + VI same
+    image_read off
+      1-cycle
+        Buf:  1.3064640ms, 1.3086625ms, 1.3098880ms
+        Pipe: 1.3067200ms, 1.3092097ms, 1.3101440ms
+      2-cycle
+        Buf:  2.5401920ms, 2.5430985ms, 2.5457440ms
+        Pipe: 2.5404320ms, 2.5434541ms, 2.5460320ms
+    image_read on
+      1-cycle
+        Buf:  2.8738560ms, 2.8805193ms, 2.8864960ms
+        Pipe: 2.8746240ms, 2.8814859ms, 2.8875040ms
+      2-cycle
+        Buf:  2.8176160ms, 2.8217543ms, 2.8279200ms
+        Pipe: 2.8182240ms, 2.8222642ms, 2.8286400ms
+  FB + VI separate
+    image_read off
+      1-cycle
+        Buf:  1.2943360ms, 1.2955808ms, 1.2961280ms
+        Pipe: 1.2946720ms, 1.2959020ms, 1.2964320ms
+      2-cycle
+        Buf:  2.5297120ms, 2.5317828ms, 2.5328320ms
+        Pipe: 2.5299360ms, 2.5320411ms, 2.5331040ms
+    image_read on
+      1-cycle
+        Buf:  2.7813120ms, 2.7849509ms, 2.7901120ms
+        Pipe: 2.7818240ms, 2.7856396ms, 2.7910560ms
+      2-cycle
+        Buf:  2.6768640ms, 2.6821616ms, 2.6881280ms
+        Pipe: 2.6771040ms, 2.6825271ms, 2.6883840ms
+
+ZB Read-Only, No VI, Z Fail
+  FB + ZB same
+    image_read off
+      1-cycle
+        Buf:  1.6950720ms, 1.6960029ms, 1.6973120ms
+        Pipe: 1.6951680ms, 1.6961030ms, 1.6973760ms
+      2-cycle
+        Buf:  2.8206560ms, 2.8214202ms, 2.8223520ms
+        Pipe: 2.8206720ms, 2.8214399ms, 2.8223680ms
+    image_read on
+      1-cycle
+        Buf:  3.0357120ms, 3.0501998ms, 3.0667840ms
+        Pipe: 3.0361280ms, 3.0506080ms, 3.0671680ms
+      2-cycle
+        Buf:  3.1809280ms, 3.1817527ms, 3.1827520ms
+        Pipe: 3.1809280ms, 3.1817569ms, 3.1827520ms
+  FB + ZB separate
+    image_read off
+      1-cycle
+        Buf:  1.6950400ms, 1.6959862ms, 1.6974400ms
+        Pipe: 1.6951360ms, 1.6960921ms, 1.6975680ms
+      2-cycle
+        Buf:  2.8207520ms, 2.8214512ms, 2.8223520ms
+        Pipe: 2.8207680ms, 2.8214707ms, 2.8223680ms
+    image_read on
+      1-cycle
+        Buf:  2.6585920ms, 2.6616913ms, 2.6642880ms
+        Pipe: 2.6590080ms, 2.6621160ms, 2.6647040ms
+      2-cycle
+        Buf:  2.9316960ms, 2.9335407ms, 2.9351200ms
+        Pipe: 2.9317120ms, 2.9335548ms, 2.9351680ms
+
+ZB Read-Only, No VI, Z Pass
+  FB + ZB same
+    image_read off
+      1-cycle
+        Buf:  3.1898240ms, 3.1916047ms, 3.1932160ms
+        Pipe: 3.1902880ms, 3.1921021ms, 3.1937440ms
+      2-cycle
+        Buf:  3.0171680ms, 3.0188267ms, 3.0206560ms
+        Pipe: 3.0173600ms, 3.0190432ms, 3.0208480ms
+    image_read on
+      1-cycle
+        Buf:  4.2146880ms, 4.2161827ms, 4.2174720ms
+        Pipe: 4.2154720ms, 4.2170242ms, 4.2182560ms
+      2-cycle
+        Buf:  3.9238240ms, 3.9250248ms, 3.9274080ms
+        Pipe: 3.9243680ms, 3.9255191ms, 3.9278880ms
+  FB + ZB separate
+    image_read off
+      1-cycle
+        Buf:  2.8025600ms, 2.8046261ms, 2.8085440ms
+        Pipe: 2.8029920ms, 2.8050739ms, 2.8089760ms
+      2-cycle
+        Buf:  2.9250400ms, 2.9280915ms, 2.9309280ms
+        Pipe: 2.9252640ms, 2.9283136ms, 2.9311200ms
+    image_read on
+      1-cycle
+        Buf:  3.7236800ms, 3.7260063ms, 3.7289920ms
+        Pipe: 3.7245280ms, 3.7268759ms, 3.7298400ms
+      2-cycle
+        Buf:  3.4491680ms, 3.4518791ms, 3.4543840ms
+        Pipe: 3.4496320ms, 3.4523457ms, 3.4547840ms
+
+ZB Write-Only, No VI
+  FB + ZB same
+    image_read off
+      1-cycle
+        Buf:  2.9999840ms, 3.0009138ms, 3.0030880ms
+        Pipe: 3.0012000ms, 3.0021614ms, 3.0043040ms
+      2-cycle
+        Buf:  3.0711520ms, 3.0719140ms, 3.0729920ms
+        Pipe: 3.0717760ms, 3.0725508ms, 3.0736000ms
+    image_read on
+      1-cycle
+        Buf:  4.3505600ms, 4.3521833ms, 4.3538560ms
+        Pipe: 4.3520640ms, 4.3536053ms, 4.3552800ms
+      2-cycle
+        Buf:  4.4280000ms, 4.4348793ms, 4.4404320ms
+        Pipe: 4.4292320ms, 4.4360466ms, 4.4417120ms
+  FB + ZB separate
+    image_read off
+      1-cycle
+        Buf:  2.2241440ms, 2.2255112ms, 2.2265760ms
+        Pipe: 2.2248480ms, 2.2262640ms, 2.2273120ms
+      2-cycle
+        Buf:  2.5890400ms, 2.5908666ms, 2.5922400ms
+        Pipe: 2.5894080ms, 2.5911838ms, 2.5925120ms
+    image_read on
+      1-cycle
+        Buf:  3.5482880ms, 3.5506336ms, 3.5534400ms
+        Pipe: 3.5492480ms, 3.5516131ms, 3.5544000ms
+      2-cycle
+        Buf:  3.4315360ms, 3.4342707ms, 3.4369120ms
+        Pipe: 3.4321120ms, 3.4348760ms, 3.4376320ms
+
+ZB Read/Write, No VI, Z Fail
+  FB + ZB same
+    image_read off
+      1-cycle
+        Buf:  1.6978880ms, 1.6988937ms, 1.6999360ms
+        Pipe: 1.6980160ms, 1.6990296ms, 1.7000320ms
+      2-cycle
+        Buf:  2.8209760ms, 2.8217375ms, 2.8225440ms
+        Pipe: 2.8210240ms, 2.8217945ms, 2.8225920ms
+    image_read on
+      1-cycle
+        Buf:  3.0519680ms, 3.0573361ms, 3.0643840ms
+        Pipe: 3.0524160ms, 3.0577764ms, 3.0648000ms
+      2-cycle
+        Buf:  3.1970560ms, 3.2003370ms, 3.2040320ms
+        Pipe: 3.1970880ms, 3.2003789ms, 3.2040640ms
+  FB + ZB separate
+    image_read off
+      1-cycle
+        Buf:  1.6978560ms, 1.6989140ms, 1.6999360ms
+        Pipe: 1.6979840ms, 1.6990534ms, 1.7000320ms
+      2-cycle
+        Buf:  2.8210080ms, 2.8217400ms, 2.8225440ms
+        Pipe: 2.8210560ms, 2.8217951ms, 2.8225920ms
+    image_read on
+      1-cycle
+        Buf:  2.6704640ms, 2.6731843ms, 2.6759680ms
+        Pipe: 2.6708800ms, 2.6736335ms, 2.6763840ms
+      2-cycle
+        Buf:  2.9370720ms, 2.9377959ms, 2.9386720ms
+        Pipe: 2.9371200ms, 2.9378499ms, 2.9387200ms
+
+ZB Read/Write, No VI, Z Pass
+  FB + ZB same
+    image_read off
+      1-cycle
+        Buf:  4.3943360ms, 4.3958008ms, 4.3968960ms
+        Pipe: 4.3957760ms, 4.3972474ms, 4.3983040ms
+      2-cycle
+        Buf:  4.4609920ms, 4.4626164ms, 4.4635520ms
+        Pipe: 4.4617280ms, 4.4632450ms, 4.4641600ms
+    image_read on
+      1-cycle
+        Buf:  5.7570560ms, 5.7588886ms, 5.7607040ms
+        Pipe: 5.7588160ms, 5.7606624ms, 5.7624640ms
+      2-cycle
+        Buf:  5.8497600ms, 5.8513218ms, 5.8527360ms
+        Pipe: 5.8505600ms, 5.8519578ms, 5.8533440ms
+  FB + ZB separate
+    image_read off
+      1-cycle
+        Buf:  3.6082880ms, 3.6108570ms, 3.6128320ms
+        Pipe: 3.6092160ms, 3.6117797ms, 3.6137280ms
+      2-cycle
+        Buf:  3.4315680ms, 3.4344351ms, 3.4372320ms
+        Pipe: 3.4322400ms, 3.4350564ms, 3.4379200ms
+    image_read on
+      1-cycle
+        Buf:  4.4896000ms, 4.4941924ms, 4.4983040ms
+        Pipe: 4.4910080ms, 4.4956123ms, 4.4998080ms
+      2-cycle
+        Buf:  4.4413920ms, 4.4451813ms, 4.4492800ms
+        Pipe: 4.4419200ms, 4.4457147ms, 4.4496320ms
+
+ZB Read/Write, VI, Z Fail
+  FB + ZB + VI separate
+    image_read off
+      1-cycle
+        Buf:  1.7084480ms, 1.7102473ms, 1.7124480ms
+        Pipe: 1.7089280ms, 1.7105477ms, 1.7127360ms
+      2-cycle
+        Buf:  2.8380000ms, 2.8380421ms, 2.8380640ms
+        Pipe: 2.8382400ms, 2.8382739ms, 2.8383040ms
+    image_read on
+      1-cycle
+        Buf:  2.7617280ms, 2.7673997ms, 2.7740320ms
+        Pipe: 2.7624320ms, 2.7682306ms, 2.7746240ms
+      2-cycle
+        Buf:  3.0108960ms, 3.0133547ms, 3.0171040ms
+        Pipe: 3.0111040ms, 3.0135766ms, 3.0173120ms
+  FB + VI same, ZB separate
+    image_read off
+      1-cycle
+        Buf:  1.7066080ms, 1.7084610ms, 1.7104640ms
+        Pipe: 1.7068800ms, 1.7087828ms, 1.7107520ms
+      2-cycle
+        Buf:  2.8380000ms, 2.8380422ms, 2.8380640ms
+        Pipe: 2.8382400ms, 2.8382741ms, 2.8383040ms
+    image_read on
+      1-cycle
+        Buf:  2.8933920ms, 2.8976609ms, 2.9018560ms
+        Pipe: 2.8940160ms, 2.8983998ms, 2.9027840ms
+      2-cycle
+        Buf:  3.0922240ms, 3.0964800ms, 3.0986400ms
+        Pipe: 3.0924480ms, 3.0966959ms, 3.0988480ms
+  FB + ZB same, VI separate
+    image_read off
+      1-cycle
+        Buf:  1.7072960ms, 1.7083185ms, 1.7104640ms
+        Pipe: 1.7075840ms, 1.7086568ms, 1.7107840ms
+      2-cycle
+        Buf:  2.8346240ms, 2.8356603ms, 2.8380640ms
+        Pipe: 2.8348480ms, 2.8358922ms, 2.8383040ms
+    image_read on
+      1-cycle
+        Buf:  3.1821120ms, 3.1885343ms, 3.1961440ms
+        Pipe: 3.1827520ms, 3.1892260ms, 3.1969280ms
+      2-cycle
+        Buf:  3.2984800ms, 3.3029583ms, 3.3068160ms
+        Pipe: 3.2986880ms, 3.3031741ms, 3.3070400ms
+  FB + ZB + VI same
+    image_read off
+      1-cycle
+        Buf:  1.7481600ms, 1.7493226ms, 1.7508000ms
+        Pipe: 1.7484480ms, 1.7496253ms, 1.7510720ms
+      2-cycle
+        Buf:  2.8488480ms, 2.8524904ms, 2.8536000ms
+        Pipe: 2.8490880ms, 2.8527223ms, 2.8538240ms
+    image_read on
+      1-cycle
+        Buf:  3.2257920ms, 3.2338199ms, 3.2420000ms
+        Pipe: 3.2264320ms, 3.2346110ms, 3.2425920ms
+      2-cycle
+        Buf:  3.3355680ms, 3.3417789ms, 3.3459360ms
+        Pipe: 3.3357760ms, 3.3419948ms, 3.3461440ms
+
+ZB Read/Write, VI, Z Pass
+  FB + ZB + VI separate
+    image_read off
+      1-cycle
+        Buf:  3.9212480ms, 3.9302227ms, 3.9372320ms
+        Pipe: 3.9223360ms, 3.9316653ms, 3.9388640ms
+      2-cycle
+        Buf:  3.8262240ms, 3.8356241ms, 3.8415360ms
+        Pipe: 3.8271200ms, 3.8364558ms, 3.8423040ms
+    image_read on
+      1-cycle
+        Buf:  4.9459360ms, 4.9552894ms, 4.9627680ms
+        Pipe: 4.9479680ms, 4.9572820ms, 4.9648000ms
+      2-cycle
+        Buf:  4.8403680ms, 4.8550267ms, 4.8666400ms
+        Pipe: 4.8419360ms, 4.8563647ms, 4.8672640ms
+  FB + VI same, ZB separate
+    image_read off
+      1-cycle
+        Buf:  4.1321440ms, 4.1436483ms, 4.1573280ms
+        Pipe: 4.1339680ms, 4.1455078ms, 4.1592160ms
+      2-cycle
+        Buf:  4.0444000ms, 4.0574917ms, 4.0683680ms
+        Pipe: 4.0452480ms, 4.0585348ms, 4.0690720ms
+    image_read on
+      1-cycle
+        Buf:  5.4221920ms, 5.4364861ms, 5.4536640ms
+        Pipe: 5.4237440ms, 5.4384871ms, 5.4557120ms
+      2-cycle
+        Buf:  5.2941120ms, 5.3288225ms, 5.3623040ms
+        Pipe: 5.2965760ms, 5.3296287ms, 5.3635360ms
+  FB + ZB same, VI separate
+    image_read off
+      1-cycle
+        Buf:  4.7766720ms, 4.7887886ms, 4.7969440ms
+        Pipe: 4.7785760ms, 4.7907949ms, 4.7997120ms
+      2-cycle
+        Buf:  4.8563200ms, 4.8647094ms, 4.8696640ms
+        Pipe: 4.8571200ms, 4.8656398ms, 4.8707840ms
+    image_read on
+      1-cycle
+        Buf:  6.2826720ms, 6.2904572ms, 6.3062880ms
+        Pipe: 6.2848480ms, 6.2927203ms, 6.3084000ms
+      2-cycle
+        Buf:  6.3386720ms, 6.3505622ms, 6.3573760ms
+        Pipe: 6.3399520ms, 6.3520545ms, 6.3581760ms
+  FB + ZB + VI same
+    image_read off
+      1-cycle
+        Buf:  4.9294240ms, 4.9359958ms, 4.9442560ms
+        Pipe: 4.9314560ms, 4.9380782ms, 4.9463680ms
+      2-cycle
+        Buf:  4.9986400ms, 5.0076045ms, 5.0172000ms
+        Pipe: 4.9996480ms, 5.0086640ms, 5.0181120ms
+    image_read on
+      1-cycle
+        Buf:  6.4048320ms, 6.4214492ms, 6.4380960ms
+        Pipe: 6.4075520ms, 6.4239375ms, 6.4405440ms
+      2-cycle
+        Buf:  6.4958560ms, 6.5066720ms, 6.5179200ms
+        Pipe: 6.4969440ms, 6.5076984ms, 6.5192160ms
+
+Alpha Compare (every pixel fails)
+  FB + ZB same
+    image_read off, z_compare off
+      1-cycle
+        Buf:  1.2443520ms, 1.2443520ms, 1.2443520ms
+        Pipe: 1.2443200ms, 1.2443200ms, 1.2443200ms
+      2-cycle
+        Buf:  2.4808320ms, 2.4808320ms, 2.4808320ms
+        Pipe: 2.4807840ms, 2.4807844ms, 2.4809760ms
+    image_read off, z_compare on
+      1-cycle
+        Buf:  1.6950400ms, 1.6960017ms, 1.6974080ms
+        Pipe: 1.6951680ms, 1.6961082ms, 1.6975360ms
+      2-cycle
+        Buf:  2.8206560ms, 2.8214354ms, 2.8223520ms
+        Pipe: 2.8206720ms, 2.8214550ms, 2.8223680ms
+    image_read on, z_compare off
+      1-cycle
+        Buf:  1.6950400ms, 1.6959837ms, 1.6974720ms
+        Pipe: 1.6951360ms, 1.6960918ms, 1.6975680ms
+      2-cycle
+        Buf:  2.5297280ms, 2.5306625ms, 2.5316480ms
+        Pipe: 2.5296800ms, 2.5306197ms, 2.5316000ms
+    image_read on, z_compare on
+      1-cycle
+        Buf:  3.0330240ms, 3.0495475ms, 3.0667520ms
+        Pipe: 3.0334400ms, 3.0499489ms, 3.0671680ms
+      2-cycle
+        Buf:  3.1808960ms, 3.1817453ms, 3.1826560ms
+        Pipe: 3.1808960ms, 3.1817508ms, 3.1826560ms
+  FB + ZB separate
+    image_read off, z_compare off
+      1-cycle
+        Buf:  1.2443520ms, 1.2443520ms, 1.2443520ms
+        Pipe: 1.2443200ms, 1.2443205ms, 1.2445760ms
+      2-cycle
+        Buf:  2.4808320ms, 2.4808322ms, 2.4808480ms
+        Pipe: 2.4807840ms, 2.4807868ms, 2.4812640ms
+    image_read off, z_compare on
+      1-cycle
+        Buf:  1.6950400ms, 1.6959935ms, 1.6973760ms
+        Pipe: 1.6951680ms, 1.6961102ms, 1.6975040ms
+      2-cycle
+        Buf:  2.8206560ms, 2.8214239ms, 2.8223520ms
+        Pipe: 2.8206720ms, 2.8214443ms, 2.8223680ms
+    image_read on, z_compare off
+      1-cycle
+        Buf:  1.6950080ms, 1.6959589ms, 1.6973120ms
+        Pipe: 1.6951360ms, 1.6960598ms, 1.6974080ms
+      2-cycle
+        Buf:  2.5296640ms, 2.5306507ms, 2.5316160ms
+        Pipe: 2.5296160ms, 2.5306092ms, 2.5315680ms
+    image_read on, z_compare on
+      1-cycle
+        Buf:  2.6589120ms, 2.6616334ms, 2.6643200ms
+        Pipe: 2.6593280ms, 2.6620630ms, 2.6647360ms
+      2-cycle
+        Buf:  2.9316640ms, 2.9335089ms, 2.9351520ms
+        Pipe: 2.9316800ms, 2.9335275ms, 2.9352320ms
